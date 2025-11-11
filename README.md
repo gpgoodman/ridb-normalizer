@@ -47,5 +47,7 @@ This project is designed to be:
 ✅ Optional demo UI for previewing cleaned data  
 ✅ Clean, documented TypeScript code for recruiters and collaborators
 
+This project uses data from the Recreation Information Database (RIDB), a U.S. Government public dataset. Data © U.S. Government, open and public domain.
+
 
 
