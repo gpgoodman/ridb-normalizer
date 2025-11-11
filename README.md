@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏕️ RIDB Normalizer
 
-## Getting Started
+**RIDB Normalizer** is an open-source project that fetches, cleans, and normalizes campground and campsite data from the [Recreation Information Database (RIDB)](https://ridb.recreation.gov/).  
+The goal is to provide a consistent, developer-friendly data model that can power projects like [Campvue](https://campvue.com) or any other recreation-focused applications.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The official RIDB API is an incredible resource for discovering federal recreation facilities across the U.S., but its data is inconsistent across agencies and sites.  
+Boolean fields may appear as strings, text may vary in structure, and records can be incomplete or malformed.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**RIDB Normalizer** provides:
+- A robust **TypeScript-based normalization layer** for facilities and campsites.
+- A **Next.js API** for serving cleaned data.
+- A **Postgres (Supabase) datastore** for caching and reusing normalized results.
+- A **Tailwind-styled admin interface** (in progress) for browsing data and testing endpoints.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project is designed to be:
+- ⚙️ **Modular** — You can import the normalization logic independently.
+- 💾 **Reliable** — Stores stable, versioned data snapshots for resilience against flaky upstream APIs.
+- 🧩 **Extensible** — Add your own cleaning rules, mappers, or enrichment logic (e.g., amenities, geospatial search).
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🧠 Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Layer | Technology                                                   |
+|-------|--------------------------------------------------------------|
+| **Framework** | [Next.js 16+](https://nextjs.org/) with App Router           |
+| **Language** | [TypeScript](https://www.typescriptlang.org/)                |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/)                     |
+| **Database** | [Supabase (PostgreSQL)](https://supabase.com/)               |
+| **Linting** | [ESLint](https://eslint.org/)                                |
+| **Bundler** | [Turbopack](https://turbo.build/pack) (dev) / Webpack (prod) |
+| **Hosting** | [Vercel](https://vercel.com/) (for demo/API hosting)         |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧰 Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+✅ Fetches campground and campsite data from the official RIDB API  
+✅ Normalizes inconsistent field types (booleans, strings, enums, etc.)  
+✅ Stores raw + normalized versions in Supabase for auditing  
+✅ Provides a clean, versioned REST API for consuming normalized data  
+✅ Supports scheduled re-sync (cron job) for upstream changes  
+✅ Optional demo UI for previewing cleaned data  
+✅ Clean, documented TypeScript code for recruiters and collaborators
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
