@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {Activities, ActivitiesSchema} from "@/lib/schemas/activities";
+import {normalizeActivities} from "@/lib/normalize/normalizeActivities";
 
 export const dynamic = 'force-dynamic';
 
@@ -85,13 +86,7 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json(
-            {
-                facilityId: id,
-                total: totalCount ?? all.length,
-                fetched: all.length,
-                limit,
-                activities: all, // raw RIDB activity records (validated minimally)
-            },
+            normalizeActivities(all),
             { status: 200 }
         );
     } catch (error: unknown) {

@@ -1,13 +1,15 @@
-import { z } from "zod";
+import { z } from 'zod';
 
+// 1) Item schema (reusable)
+export const ActivitySchema = z.object({
+    ActivityID: z.number(),          // or z.coerce.number() if you prefer numbers
+    ActivityName: z.string(),
+});
+export type Activity = z.infer<typeof ActivitySchema>;
+
+// 2) Page schema (wraps the item schema)
 export const ActivitiesSchema = z.object({
-    RECDATA: z.array(
-        z.object({
-            ActivityID: z.number(),            // Keep as string; you can coerce later in a normalizer if desired
-            ActivityName: z.string().optional()
-        })
-    ).default([]),
-
+    RECDATA: z.array(ActivitySchema).default([]),
     METADATA: z.object({
         RESULTS: z.object({
             TOTAL_COUNT: z.number().optional(),
@@ -16,5 +18,7 @@ export const ActivitiesSchema = z.object({
         }).partial().optional(),
     }).partial().optional(),
 });
-
 export type Activities = z.infer<typeof ActivitiesSchema>;
+
+export const ActivityArraySchema = z.array(ActivitySchema);
+export type ActivityList = z.infer<typeof ActivityArraySchema>;
