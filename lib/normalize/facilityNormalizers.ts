@@ -77,3 +77,16 @@ export function normalizeCampgroundName(raw: string): string {
 }
 
 
+export const normalizeParkType = (park:string):string | null => {
+    if (!park) return null;
+
+    const name = park.toLowerCase();
+
+    if (name.includes('national forest')) return 'national forest';
+    if (name.includes('national monument')) return 'national monument';
+    if (name.includes('national park')) return 'national';
+
+    return null;
+}
+
+
