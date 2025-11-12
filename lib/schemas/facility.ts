@@ -7,6 +7,13 @@ export const FacilitySchema = z.object({
     FacilityLatitude: z.number().nullable(),
     FacilityLongitude: z.number().nullable(),
     FacilityTypeDescription: z.string().optional(),
+    RECAREA: z
+        .array(
+            z.object({
+                RecAreaName: z.string(),
+            })
+        )
+        .optional(),
     // ... add more fields as you explore the RIDB response
 });
 

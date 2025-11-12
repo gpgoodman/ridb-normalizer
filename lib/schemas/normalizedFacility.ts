@@ -3,9 +3,12 @@ import { z } from "zod";
 export const NormalizedFacilitySchema = z.object({
     ridbId: z.string(),
     name: z.string(),
+    park: z.string(),
     latitude: z.number().nullable(),
     longitude: z.number().nullable(),
     type: z.string().optional(),
+    reservations: z.string().optional(),
+    parkType: z.string().optional(),
     descriptionRawHtml: z.string().optional(),
     description: z.string().optional(),
     descriptionForEmbedding: z.string().optional(),
