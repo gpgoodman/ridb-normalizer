@@ -22,6 +22,25 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
         clearTimeout(to);
     }
 }
+/**
+ * @openapi
+ * /api/activities:
+ *   get:
+ *     description: Fetch and normalize RIDB activities data by facility id.
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Normalized activities
+ *       400:
+ *         description: Missing ID
+ *       500:
+ *         description: RIDB error or server error
+ */
 
 export async function GET(request: Request) {
     try {
