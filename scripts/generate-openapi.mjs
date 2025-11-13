@@ -1,6 +1,14 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import { writeFile } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
-export const swaggerDefinition = {
+// ESM __dirname shim
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 1) Base OpenAPI metadata
+const swaggerDefinition = {
     openapi: "3.0.0",
     info: {
         title: "RIDB Normalizer API",
@@ -8,7 +16,6 @@ export const swaggerDefinition = {
         description:
             "API documentation for RIDB normalization endpoints used for Campvue and AI integrations.",
     },
-    // Keep prod first so Swagger UI defaults to the live URL
     servers: [
         {
             url: "https://ridb-normalizer.vercel.app",
@@ -21,7 +28,8 @@ export const swaggerDefinition = {
     ],
 };
 
-export const swaggerOptions = {
+// 2) Where swagger-jsdoc should look for JSDoc comments
+const swaggerOptions = {
     definition: swaggerDefinition,
     apis: [
         "./app/api/**/*.ts",
@@ -31,4 +39,11 @@ export const swaggerOptions = {
     ],
 };
 
-export const openapiSpec = swaggerJsdoc(swaggerOptions);
+// 3) Generate the spec
+const spec = swaggerJsdoc(swaggerOptions);
+
+// 4) Write to openapi.json at project root
+const outPath = path.join(__dirname, "..", "openapi.json");
+
+await writeFile(outPath, JSON.stringify(spec, null, 2), "utf-8");
+console.log(`✅ OpenAPI spec written to ${outPath}`);
