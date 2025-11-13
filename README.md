@@ -5,7 +5,7 @@ The goal is to provide a consistent, developer-friendly data model that can powe
 
 ## 🔗 Project Links
 
-- **GitHub Repository:** https://github.com/gpgoodman/ridb-normalizer
+- **Main Page:** https://ridb-normalizer.vercel.app
 - **Live Swagger API Docs:** https://ridb-normalizer.vercel.app/docs
 
 
