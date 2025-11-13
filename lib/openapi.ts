@@ -21,9 +21,13 @@ export const swaggerDefinition = {
 };
 
 export const swaggerOptions = {
-    swaggerDefinition,
-    // All files where you write Swagger docs in JSDoc
-    apis: ["./app/api/**/*.ts"],
+    definition: swaggerDefinition,
+    apis: [
+        "./app/api/**/*.ts",
+        "./app/api/**/*.js",
+        "./pages/api/**/*.ts",
+        "./pages/api/**/*.js",
+    ],
 };
 
 export const openapiSpec = swaggerJsdoc(swaggerOptions);
