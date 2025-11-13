@@ -14,7 +14,7 @@ export const swaggerDefinition = {
             description: "Local dev server",
         },
         {
-            url: "https://YOUR_DEPLOYED_URL", // replace later
+            url: "https://ridb-normalizer.vercel.app",
             description: "Production server",
         },
     ],
