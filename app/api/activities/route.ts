@@ -26,21 +26,35 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  * @openapi
  * /api/activities:
  *   get:
- *     description: Fetch and normalize RIDB activities data by facility id.
+ *     summary: Fetch and normalize RIDB facility activities data.
+ *     description: >
+ *       Returns a normalized view of a single facility's activities from the Recreation Information
+ *       Database (RIDB). You can try this using a facility ID taken from a
+ *       recreation.gov campground URL.
+ *
+ *       For example, the Mather Campground URL:
+ *       https://www.recreation.gov/camping/campgrounds/232490
+ *       has facility ID **232490**.
  *     parameters:
  *       - in: query
  *         name: id
  *         required: true
+ *         description: >
+ *           RIDB FacilityID (numeric ID from the recreation.gov campground URL),
+ *           e.g. **232490** for Mather Campground at Grand Canyon.
  *         schema:
  *           type: string
+ *           example: "232490"
+ *           default: "232490"
  *     responses:
  *       200:
- *         description: Normalized activities
+ *         description: Normalized facility
  *       400:
  *         description: Missing ID
  *       500:
  *         description: RIDB error or server error
  */
+
 
 export async function GET(request: Request) {
     try {
