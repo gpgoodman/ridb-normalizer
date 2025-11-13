@@ -15,6 +15,27 @@ function hasFacilityID(x: unknown): x is { FacilityID: unknown } {
     return typeof x === 'object' && x !== null && 'FacilityID' in x;
 }
 
+/**
+ * @openapi
+ * /api/facility:
+ *   get:
+ *     description: Fetch and normalize RIDB facility data.
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Normalized facility
+ *       400:
+ *         description: Missing ID
+ *       500:
+ *         description: RIDB error or server error
+ */
+
+
 export async function GET(request: Request) {
     try {
         // Query param: /api/facility?id=232490
