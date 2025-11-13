@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/generate-openapi.mjs && next dev",
     "build": "next build",
+    "postbuild": "node scripts/generate-openapi.mjs",
     "start": "next start",
     "lint": "eslint"
   },

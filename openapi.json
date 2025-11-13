@@ -1,0 +1,82 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "RIDB Normalizer API",
+    "version": "1.0.0",
+    "description": "API documentation for RIDB normalization endpoints used for Campvue and AI integrations."
+  },
+  "servers": [
+    {
+      "url": "https://ridb-normalizer.vercel.app",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local dev server"
+    }
+  ],
+  "paths": {
+    "/api/activities": {
+      "get": {
+        "summary": "Fetch and normalize RIDB facility activities data.",
+        "description": "Returns a normalized view of a single facility's activities from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB FacilityID (numeric ID from the recreation.gov campground URL), e.g. **232490** for Mather Campground at Grand Canyon.\n",
+            "schema": {
+              "type": "string",
+              "example": "232490",
+              "default": "232490"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized facility"
+          },
+          "400": {
+            "description": "Missing ID"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
+    "/api/facility": {
+      "get": {
+        "summary": "Fetch and normalize RIDB facility data.",
+        "description": "Returns a normalized view of a single facility from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB FacilityID (numeric ID from the recreation.gov campground URL), e.g. **232490** for Mather Campground at Grand Canyon.\n",
+            "schema": {
+              "type": "string",
+              "example": "232490",
+              "default": "232490"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized facility"
+          },
+          "400": {
+            "description": "Missing ID"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": []
+}
