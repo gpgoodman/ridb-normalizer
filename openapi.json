@@ -16,6 +16,23 @@
     }
   ],
   "paths": {
+    "/api/activities": {
+      "get": {
+        "summary": "Fetch and normalize RIDB all activities data.",
+        "description": "Returns a normalized view of all activities from the Recreation Information Database (RIDB).\n",
+        "responses": {
+          "200": {
+            "description": "Normalized activities"
+          },
+          "400": {
+            "description": "Missing ID"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
     "/api/activitiesById": {
       "get": {
         "summary": "Fetch and normalize RIDB facility activitiesById data.",
