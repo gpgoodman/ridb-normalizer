@@ -16,10 +16,10 @@
     }
   ],
   "paths": {
-    "/api/activities": {
+    "/api/activitiesById": {
       "get": {
-        "summary": "Fetch and normalize RIDB facility activities data.",
-        "description": "Returns a normalized view of a single facility's activities from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\n",
+        "summary": "Fetch and normalize RIDB facility activitiesById data.",
+        "description": "Returns a normalized view of a single facility's activitiesById from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\n",
         "parameters": [
           {
             "in": "query",

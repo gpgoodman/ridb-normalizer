@@ -24,11 +24,11 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 }
 /**
  * @openapi
- * /api/activities:
+ * /api/activitiesById:
  *   get:
- *     summary: Fetch and normalize RIDB facility activities data.
+ *     summary: Fetch and normalize RIDB facility activitiesById data.
  *     description: >
- *       Returns a normalized view of a single facility's activities from the Recreation Information
+ *       Returns a normalized view of a single facility's activitiesById from the Recreation Information
  *       Database (RIDB). You can try this using a facility ID taken from a
  *       recreation.gov campground URL.
  *
@@ -59,7 +59,7 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id'); // /api/activities?id=232490
+        const id = searchParams.get('id'); // /api/activitiesById?id=232490
         if (!id) {
             return NextResponse.json({ error: 'Missing required query parameter: id' }, { status: 400 });
         }
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
             try {
                 json = await response.json();
             } catch {
-                throw new Error('Invalid or incomplete JSON received from RIDB (activities)');
+                throw new Error('Invalid or incomplete JSON received from RIDB (activitiesById)');
             }
 
             const parsed = ActivitiesSchema.parse(json);
@@ -123,10 +123,10 @@ export async function GET(request: Request) {
             { status: 200 }
         );
     } catch (error: unknown) {
-        console.error('RIDB activities fetch error:', error);
+        console.error('RIDB activitiesById fetch error:', error);
         return NextResponse.json(
             {
-                error: 'Failed to fetch activities from RIDB',
+                error: 'Failed to fetch activitiesById from RIDB',
                 details: getErrorMessage(error),
             },
             { status: 500 }
