@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import {Activities, ActivitiesSchema} from "@/lib/schemas/activities";
-import {normalizeActivities} from "@/lib/normalize/normalizeActivities";
+import { Activities, ActivitiesSchema } from "@/lib/schemas/activities";
+import { normalizeActivities } from "@/lib/normalize/normalizeActivities";
 
 export const dynamic = 'force-dynamic';
 
 const RIDB_BASE_URL = 'https://ridb.recreation.gov/api/v1/facilities';
 const FETCH_TIMEOUT_MS = 12_000;
-const RIDB_PAGE_LIMIT = 50; // RIDB max
+const RIDB_PAGE_LIMIT = 50; // RIDB max page size
+const MAX_PAGES_DEFAULT = 10; // safety valve for default "fetch all" mode
 
 function getErrorMessage(err: unknown): string {
     return err instanceof Error ? err.message : 'Unknown error';
@@ -22,19 +23,25 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
         clearTimeout(to);
     }
 }
+
 /**
  * @openapi
  * /api/activitiesById:
  *   get:
  *     summary: Fetch and normalize RIDB facility activitiesById data.
  *     description: >
- *       Returns a normalized view of a single facility's activitiesById from the Recreation Information
+ *       Returns a normalized view of a single facility's activities by facility id from the Recreation Information
  *       Database (RIDB). You can try this using a facility ID taken from a
  *       recreation.gov campground URL.
  *
  *       For example, the Mather Campground URL:
  *       https://www.recreation.gov/camping/campgrounds/232490
  *       has facility ID **232490**.
+ *
+ *       This endpoint will page through RIDB results using the provided `limit` and `offset`
+ *       values (or their defaults) and return all activities for the facility starting at
+ *       that offset. You can optionally use `take` to limit the number of normalized items
+ *       returned by this endpoint.
  *     parameters:
  *       - in: query
  *         name: id
@@ -46,22 +53,65 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *           type: string
  *           example: "232490"
  *           default: "232490"
+ *
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         description: >
+ *           Number of activity records to request from RIDB for this facility per page (page size).
+ *           Must be an integer between 1 and 50 (RIDB maximum). Defaults to **50** when not provided.
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 50
+ *           example: 50
+ *           default: 50
+ *
+ *       - in: query
+ *         name: offset
+ *         required: false
+ *         description: >
+ *           Start record of the overall result set, as defined by the RIDB API.
+ *           Must be a non-negative integer. Defaults to **0** when not provided.
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           example: 0
+ *           default: 0
+ *
+ *       - in: query
+ *         name: take
+ *         required: false
+ *         description: >
+ *           Maximum number of normalized activity items to return **from this endpoint**.
+ *           Unlike RIDB's `limit` (page size), `take` limits the final response array
+ *           after all paging and normalization is complete. If omitted or set to `0`,
+ *           all normalized results are returned.
+ *           This feature does not exist in the RIDB API.
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           example: 0
+ *           default: 0
+ *
  *     responses:
  *       200:
- *         description: Normalized facility
+ *         description: Normalized activities by facility
  *       400:
- *         description: Missing ID
+ *         description: Missing or invalid query parameters (e.g. id, limit, offset, or take)
  *       500:
  *         description: RIDB error or server error
  */
-
-
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id'); // /api/activitiesById?id=232490
+
         if (!id) {
-            return NextResponse.json({ error: 'Missing required query parameter: id' }, { status: 400 });
+            return NextResponse.json(
+                { error: "Missing required query parameter: 'id'" },
+                { status: 400 }
+            );
         }
 
         if (!process.env.RIDB_API_KEY) {
@@ -71,25 +121,76 @@ export async function GET(request: Request) {
             );
         }
 
-        // Optional overrides for debugging (safe defaults)
-        const limit = Math.min(
-            Number(searchParams.get('limit') ?? RIDB_PAGE_LIMIT) || RIDB_PAGE_LIMIT,
-            RIDB_PAGE_LIMIT
-        );
-        const maxPages = Math.max(Number(searchParams.get('maxPages') ?? 10) || 10, 1); // safety valve
+        const rawLimit = searchParams.get('limit');
+        const rawOffset = searchParams.get('offset');
+        const rawTake = searchParams.get('take');
+
+        // --- Parse & validate limit ---
+        let limit = RIDB_PAGE_LIMIT; // default
+        if (rawLimit !== null) {
+            const parsedLimit = Number(rawLimit);
+            if (
+                !Number.isInteger(parsedLimit) ||
+                parsedLimit < 1 ||
+                parsedLimit > RIDB_PAGE_LIMIT
+            ) {
+                return NextResponse.json(
+                    {
+                        error: `Invalid 'limit' query parameter. Must be an integer between 1 and ${RIDB_PAGE_LIMIT}.`,
+                    },
+                    { status: 400 }
+                );
+            }
+            limit = parsedLimit;
+        }
+
+        // --- Parse & validate offset ---
+        let offset = 0; // default
+        if (rawOffset !== null) {
+            const parsedOffset = Number(rawOffset);
+            if (!Number.isInteger(parsedOffset) || parsedOffset < 0) {
+                return NextResponse.json(
+                    {
+                        error: "Invalid 'offset' query parameter. Must be a non-negative integer.",
+                    },
+                    { status: 400 }
+                );
+            }
+            offset = parsedOffset;
+        }
+
+        // --- Parse & validate take ---
+        let take: number | null = null;
+        if (rawTake !== null) {
+            const parsedTake = Number(rawTake);
+
+            // take = 0 → treat as “no limit”
+            if (parsedTake === 0) {
+                take = null;
+            } else if (!Number.isInteger(parsedTake) || parsedTake < 0) {
+                return NextResponse.json(
+                    { error: "Invalid 'take' query parameter. Must be a non-negative integer." },
+                    { status: 400 }
+                );
+            } else {
+                take = parsedTake; // 1 or more
+            }
+        }
 
         const headers = {
             accept: 'application/json',
             apikey: process.env.RIDB_API_KEY!,
-    };
+        };
 
-        let offset = Number(searchParams.get('offset') ?? 0) || 0;
+        // --- Fetch activities for the facility using paging + TOTAL_COUNT to decide when to stop ---
         const all: Activities['RECDATA'] = [];
+        let currentOffset = offset;
         let totalCount: number | null = null;
+        const MAX_PAGES = MAX_PAGES_DEFAULT; // safety so we don't accidentally hammer RIDB
 
-        for (let page = 0; page < maxPages; page++) {
+        for (let page = 0; page < MAX_PAGES; page++) {
             const url =
-                `${RIDB_BASE_URL}/${encodeURIComponent(id)}/activities?limit=${limit}&offset=${offset}`;
+                `${RIDB_BASE_URL}/${encodeURIComponent(id)}/activities?limit=${limit}&offset=${currentOffset}`;
 
             const response = await fetchWithTimeout(url, headers);
             if (!response.ok) {
@@ -103,7 +204,7 @@ export async function GET(request: Request) {
                 throw new Error('Invalid or incomplete JSON received from RIDB (activitiesById)');
             }
 
-            const parsed = ActivitiesSchema.parse(json);
+            const parsed: Activities = ActivitiesSchema.parse(json);
             const items = parsed.RECDATA ?? [];
             all.push(...items);
 
@@ -112,16 +213,31 @@ export async function GET(request: Request) {
                 totalCount = meta.TOTAL_COUNT;
             }
 
-            // Stop if we fetched fewer than limit (last page) or there were no items
-            if (items.length < limit) break;
+            // Stop if no items were returned
+            if (items.length === 0) {
+                break;
+            }
 
-            offset += limit;
+            // Stop if we've already collected all known records
+            if (totalCount != null && all.length >= totalCount) {
+                break;
+            }
+
+            // Fallback: if RIDB honors page size and returns fewer than requested, it's the last page
+            if (items.length < limit) {
+                break;
+            }
+
+            currentOffset += limit;
         }
 
-        return NextResponse.json(
-            normalizeActivities(all),
-            { status: 200 }
-        );
+        let normalized = normalizeActivities(all);
+
+        if (take !== null) {
+            normalized = normalized.slice(0, take);
+        }
+
+        return NextResponse.json(normalized, { status: 200 });
     } catch (error: unknown) {
         console.error('RIDB activitiesById fetch error:', error);
         return NextResponse.json(

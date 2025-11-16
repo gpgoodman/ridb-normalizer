@@ -18,14 +18,52 @@
   "paths": {
     "/api/activities": {
       "get": {
-        "summary": "Fetch and normalize RIDB all activities data.",
-        "description": "Returns a normalized view of all activities from the Recreation Information Database (RIDB).\n",
+        "summary": "Fetch and normalize RIDB activities data.",
+        "description": "Returns a normalized view of activities from the Recreation Information Database (RIDB).\nBy default (when `getAll` is not provided or false), this endpoint returns a **single page** of activities, controlled by the `limit` and `offset` parameters.\nWhen `getAll` is true, the endpoint will page through the RIDB /activities API using a page size of 50 and return **all** activities in a single response. In this mode, any `limit` and `offset` query parameters are ignored, even if they appear in the URL (including Swagger UI defaults).\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Page size for a single request to RIDB. Must be an integer between 1 and 50 (RIDB maximum). Defaults to **50** when not provided. Ignored when `getAll=true`.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "example": 50,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "description": "Start record of the overall result set, as defined by the RIDB API. Must be a non-negative integer. Defaults to **0** when not provided. Ignored when `getAll=true`.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "getAll",
+            "required": false,
+            "description": "When true, this endpoint will page through the RIDB /activities API and return **all** activities in a single response. In this mode, the `limit` and `offset` query parameters are ignored, even if provided (including when Swagger UI shows default values of 50 and 0).\n",
+            "schema": {
+              "type": "boolean",
+              "example": false,
+              "default": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Normalized activities"
           },
           "400": {
-            "description": "Missing ID"
+            "description": "Invalid query parameters (e.g. limit or offset)"
           },
           "500": {
             "description": "RIDB error or server error"
@@ -36,7 +74,7 @@
     "/api/activitiesById": {
       "get": {
         "summary": "Fetch and normalize RIDB facility activitiesById data.",
-        "description": "Returns a normalized view of a single facility's activitiesById from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\n",
+        "description": "Returns a normalized view of a single facility's activities by facility id from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\nThis endpoint will page through RIDB results using the provided `limit` and `offset` values (or their defaults) and return all activities for the facility starting at that offset. You can optionally use `take` to limit the number of normalized items returned by this endpoint.\n",
         "parameters": [
           {
             "in": "query",
@@ -48,14 +86,51 @@
               "example": "232490",
               "default": "232490"
             }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Number of activity records to request from RIDB for this facility per page (page size). Must be an integer between 1 and 50 (RIDB maximum). Defaults to **50** when not provided.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "example": 50,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "description": "Start record of the overall result set, as defined by the RIDB API. Must be a non-negative integer. Defaults to **0** when not provided.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "required": false,
+            "description": "Maximum number of normalized activity items to return **from this endpoint**. Unlike RIDB's `limit` (page size), `take` limits the final response array after all paging and normalization is complete. If omitted or set to `0`, all normalized results are returned. This feature does not exist in the RIDB API.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0,
+              "default": 0
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Normalized facility"
+            "description": "Normalized activities by facility"
           },
           "400": {
-            "description": "Missing ID"
+            "description": "Missing or invalid query parameters (e.g. id, limit, offset, or take)"
           },
           "500": {
             "description": "RIDB error or server error"
