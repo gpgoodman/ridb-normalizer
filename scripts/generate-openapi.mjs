@@ -26,6 +26,18 @@ const swaggerDefinition = {
             description: "Local dev server",
         },
     ],
+    tags: [
+        {
+            name: 'Activities',
+            description:
+                'Activities are normalized from the RIDB /activities and /facilities/{id}/activities endpoints.',
+        },
+        {
+            name: 'Facilities',
+            description:
+                'Facilities and related metadata normalized from the RIDB /facilities endpoints.',
+        },
+    ],
 };
 
 // 2) Where swagger-jsdoc should look for JSDoc comments
