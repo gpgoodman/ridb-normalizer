@@ -19,6 +19,8 @@ function hasFacilityID(x: unknown): x is { FacilityID: unknown } {
  * @openapi
  * /api/facility:
  *   get:
+ *     tags:
+ *       - Facilities
  *     summary: Fetch and normalize RIDB facility data.
  *     description: >
  *       Returns a normalized view of a single facility from the Recreation Information

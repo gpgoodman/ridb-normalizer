@@ -28,6 +28,8 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  * @openapi
  * /api/activities:
  *   get:
+ *     tags:
+ *       - Activities
  *     summary: Fetch and normalize RIDB activities data.
  *     description: >
  *       Returns a normalized view of activities from the Recreation Information
