@@ -45,6 +45,15 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *       ignored, even if they appear in the URL (including Swagger UI defaults).
  *     parameters:
  *       - in: query
+ *         name: query
+ *         required: false
+ *         description: >
+ *           Query filter criteria. Searches on activity name using RIDB's substring
+ *           matcher (e.g. `query=biking` will match "Biking"). If left blank, this
+ *           parameter is ignored and all activities are returned.
+ *         schema:
+ *           type: string
+ *       - in: query
  *         name: limit
  *         required: false
  *         description: >
@@ -99,6 +108,11 @@ export async function GET(request: Request) {
         const rawGetAll = searchParams.get('getAll');
         const getAll = rawGetAll === 'true';
 
+        // Treat null or empty/whitespace as "no query filter"
+        const rawQuery = searchParams.get('query');
+        const query =
+            rawQuery && rawQuery.trim() !== '' ? rawQuery.trim() : null;
+
         if (!process.env.RIDB_API_KEY) {
             return NextResponse.json(
                 { error: 'Server misconfigured: missing RIDB_API_KEY' },
@@ -111,17 +125,20 @@ export async function GET(request: Request) {
             apikey: process.env.RIDB_API_KEY!,
         };
 
-        // --- getAll mode: page through RIDB and return everything ---
+        // --- getAll mode: page through RIDB and return everything (optionally filtered by query) ---
         if (getAll) {
             const all: Activities['RECDATA'] = [];
             let offset = 0;
             const limit = RIDB_PAGE_LIMIT;
 
             const rawMaxPages = searchParams.get('maxPages');
-            const maxPages = Math.max(Number(rawMaxPages ?? MAX_PAGES_DEFAULT) || MAX_PAGES_DEFAULT, 1);
+            const maxPages =
+                Math.max(Number(rawMaxPages ?? MAX_PAGES_DEFAULT) || MAX_PAGES_DEFAULT, 1);
 
             for (let page = 0; page < maxPages; page++) {
-                const url = `${RIDB_BASE_URL}?limit=${limit}&offset=${offset}`;
+                const url =
+                    `${RIDB_BASE_URL}?limit=${limit}&offset=${offset}` +
+                    (query ? `&query=${encodeURIComponent(query)}` : '');
 
                 const response = await fetchWithTimeout(url, headers);
                 if (!response.ok) {
@@ -193,7 +210,10 @@ export async function GET(request: Request) {
             offset = parsedOffset;
         }
 
-        const url = `${RIDB_BASE_URL}?limit=${limit}&offset=${offset}`;
+        const url =
+            `${RIDB_BASE_URL}?limit=${limit}&offset=${offset}` +
+            (query ? `&query=${encodeURIComponent(query)}` : '');
+
         const response = await fetchWithTimeout(url, headers);
 
         if (!response.ok) {

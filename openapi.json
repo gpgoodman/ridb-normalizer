@@ -36,6 +36,15 @@
         "parameters": [
           {
             "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Query filter criteria. Searches on activity name using RIDB's substring matcher (e.g. `query=biking` will match \"Biking\"). If left blank, this parameter is ignored and all activities are returned.\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "limit",
             "required": false,
             "description": "Page size for a single request to RIDB. Must be an integer between 1 and 50 (RIDB maximum). Defaults to **50** when not provided. Ignored when `getAll=true`.\n",
