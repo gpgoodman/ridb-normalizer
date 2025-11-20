@@ -163,6 +163,40 @@
         }
       }
     },
+    "/api/activityById": {
+      "get": {
+        "tags": [
+          "Activities"
+        ],
+        "summary": "Fetch and normalize RIDB a single activity's data.",
+        "description": "Returns a normalized view of a single activity by activity id from the Recreation Information Database (RIDB). You need an activity id to use this api, e.g. 4, 50, 75...  ids are easily obtained from the list of all activities here at /activities or via the RIDB endpoint.\nFor example, the RIDB activities endpoint exposes: {\n \"ActivityID\": 4,\n \"ActivityLevel\": 0,\n \"ActivityName\": \"AUTO TOURING\",\n \"ActivityParentID\": 0\n} and has activity ID **4**.\nThis endpoint returns one activity by id at a time. No paging required.  If an activity by id is not found, note the 404 spec below.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB ActivityID (numeric ID from the recreation.gov list of activities), e.g. **4** for Auto Touring.\n",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized activities by activity id"
+          },
+          "400": {
+            "description": "Missing id"
+          },
+          "404": {
+            "description": "Activity not found (RIDB returned id 0 and empty name)"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
     "/api/facility": {
       "get": {
         "tags": [
