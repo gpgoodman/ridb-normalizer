@@ -93,12 +93,12 @@
         }
       }
     },
-    "/api/activitiesById": {
+    "/api/activitiesByFacilityId": {
       "get": {
         "tags": [
           "Activities"
         ],
-        "summary": "Fetch and normalize RIDB facility activitiesById data.",
+        "summary": "Fetch and normalize RIDB facility activitiesByFacilityId data.",
         "description": "Returns a normalized view of a single facility's activities by facility id from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\nThis endpoint will page through RIDB results using the provided `limit` and `offset` values (or their defaults) and return all activities for the facility starting at that offset. You can optionally use `take` to limit the number of normalized items returned by this endpoint.\n",
         "parameters": [
           {

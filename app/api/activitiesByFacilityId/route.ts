@@ -26,11 +26,11 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 
 /**
  * @openapi
- * /api/activitiesById:
+ * /api/activitiesByFacilityId:
  *   get:
  *     tags:
  *       - Activities
- *     summary: Fetch and normalize RIDB facility activitiesById data.
+ *     summary: Fetch and normalize RIDB facility activitiesByFacilityId data.
  *     description: >
  *       Returns a normalized view of a single facility's activities by facility id from the Recreation Information
  *       Database (RIDB). You can try this using a facility ID taken from a
@@ -107,7 +107,7 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id'); // /api/activitiesById?id=232490
+        const id = searchParams.get('id'); // /api/activitiesByFacilityId?id=232490
 
         if (!id) {
             return NextResponse.json(
@@ -203,7 +203,7 @@ export async function GET(request: Request) {
             try {
                 json = await response.json();
             } catch {
-                throw new Error('Invalid or incomplete JSON received from RIDB (activitiesById)');
+                throw new Error('Invalid or incomplete JSON received from RIDB (activitiesByFacilityId)');
             }
 
             const parsed: Activities = ActivitiesSchema.parse(json);
@@ -241,10 +241,10 @@ export async function GET(request: Request) {
 
         return NextResponse.json(normalized, { status: 200 });
     } catch (error: unknown) {
-        console.error('RIDB activitiesById fetch error:', error);
+        console.error('RIDB activitiesByFacilityId fetch error:', error);
         return NextResponse.json(
             {
-                error: 'Failed to fetch activitiesById from RIDB',
+                error: 'Failed to fetch activitiesByFacilityId from RIDB',
                 details: getErrorMessage(error),
             },
             { status: 500 }
