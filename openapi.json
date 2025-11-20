@@ -93,12 +93,12 @@
         }
       }
     },
-    "/api/activitiesById": {
+    "/api/activitiesByFacilityId": {
       "get": {
         "tags": [
           "Activities"
         ],
-        "summary": "Fetch and normalize RIDB facility activitiesById data.",
+        "summary": "Fetch and normalize RIDB facility activitiesByFacilityId data.",
         "description": "Returns a normalized view of a single facility's activities by facility id from the Recreation Information Database (RIDB). You can try this using a facility ID taken from a recreation.gov campground URL.\nFor example, the Mather Campground URL: https://www.recreation.gov/camping/campgrounds/232490 has facility ID **232490**.\nThis endpoint will page through RIDB results using the provided `limit` and `offset` values (or their defaults) and return all activities for the facility starting at that offset. You can optionally use `take` to limit the number of normalized items returned by this endpoint.\n",
         "parameters": [
           {
@@ -156,6 +156,40 @@
           },
           "400": {
             "description": "Missing or invalid query parameters (e.g. id, limit, offset, or take)"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
+    "/api/activityById": {
+      "get": {
+        "tags": [
+          "Activities"
+        ],
+        "summary": "Fetch and normalize RIDB a single activity's data.",
+        "description": "Returns a normalized view of a single activity by activity id from the Recreation Information Database (RIDB). You need an activity id to use this api, e.g. 4, 50, 75...  ids are easily obtained from the list of all activities here at /activities or via the RIDB endpoint.\nFor example, the RIDB activities endpoint exposes: {\n \"ActivityID\": 4,\n \"ActivityLevel\": 0,\n \"ActivityName\": \"AUTO TOURING\",\n \"ActivityParentID\": 0\n} and has activity ID **4**.\nThis endpoint returns one activity by id at a time. No paging required.  If an activity by id is not found, note the 404 spec below.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB ActivityID (numeric ID from the recreation.gov list of activities), e.g. **4** for Auto Touring.\n",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized activities by activity id"
+          },
+          "400": {
+            "description": "Missing id"
+          },
+          "404": {
+            "description": "Activity not found (RIDB returned id 0 and empty name)"
           },
           "500": {
             "description": "RIDB error or server error"
