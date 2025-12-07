@@ -26,7 +26,7 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 
 /**
  * @openapi
- * /api/activities:
+ * /api/v1/ridb/activities:
  *   get:
  *     tags:
  *       - Activities
