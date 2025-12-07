@@ -26,7 +26,7 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 
 /**
  * @openapi
- * /api/activitiesByFacilityId:
+ * /api/v1/ridb/activitiesByFacilityId:
  *   get:
  *     tags:
  *       - Activities
@@ -107,7 +107,7 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id'); // /api/activitiesByFacilityId?id=232490
+        const id = searchParams.get('id');
 
         if (!id) {
             return NextResponse.json(

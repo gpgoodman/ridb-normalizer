@@ -26,7 +26,7 @@
     }
   ],
   "paths": {
-    "/api/activities": {
+    "/api/v1/ridb/activities": {
       "get": {
         "tags": [
           "Activities"
@@ -93,7 +93,7 @@
         }
       }
     },
-    "/api/activitiesByFacilityId": {
+    "/api/v1/ridb/activitiesByFacilityId": {
       "get": {
         "tags": [
           "Activities"
@@ -163,7 +163,7 @@
         }
       }
     },
-    "/api/activityById": {
+    "/api/v1/ridb/activityById": {
       "get": {
         "tags": [
           "Activities"
@@ -197,7 +197,7 @@
         }
       }
     },
-    "/api/facility": {
+    "/api/v1/ridb/facility": {
       "get": {
         "tags": [
           "Facilities"

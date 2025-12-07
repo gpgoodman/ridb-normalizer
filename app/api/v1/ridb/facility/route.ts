@@ -17,7 +17,7 @@ function hasFacilityID(x: unknown): x is { FacilityID: unknown } {
 
 /**
  * @openapi
- * /api/facility:
+ * /api/v1/ridb/facility:
  *   get:
  *     tags:
  *       - Facilities
