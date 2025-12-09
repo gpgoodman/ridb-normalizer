@@ -14,12 +14,12 @@ export const AmenitiesSchema = z.object({
             CURRENT_COUNT: z.number().optional(),
             TOTAL_COUNT: z.number().optional(),
         }),
+        SEARCH_PARAMETERS: z.object({
+            LIMIT: z.number().optional(),
+            OFFSET: z.number().optional(),
+            QUERY: z.string().optional(),
+        })
     }),
-    SEARCH_PARAMETERS: z.object({
-        LIMIT: z.number().optional(),
-        OFFSET: z.number().optional(),
-        QUERY: z.string().optional(),
-    })
 })
 
 export type Amenities = z.infer<typeof AmenitiesSchema>;
