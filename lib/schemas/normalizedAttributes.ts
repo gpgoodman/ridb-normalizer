@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const NormalizedAttributeSchema =  z.object({
-    // key: z.string(),
+    key: z.string(),
     label: z.string(),
     scope: z.enum(['campground', 'campsite', 'unknown']),
     isAmenity: z.boolean(),
