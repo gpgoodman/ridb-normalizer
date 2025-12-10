@@ -1,14 +1,14 @@
 import {z} from "zod";
 
-export const AmenitySchema = z.object({
+export const AttributeSchema = z.object({
     AttributeName: z.string(),
     AttributeValue: z.string(),
 });
 
-export type Amenity = z.infer<typeof AmenitySchema>;
+export type Attribute = z.infer<typeof AttributeSchema>;
 
-export const AmenitiesSchema = z.object({
-    RECDATA: z.array(AmenitySchema).default([]),
+export const AttributesSchema = z.object({
+    RECDATA: z.array(AttributeSchema).default([]),
     METADATA: z.object({
         RESULTS: z.object({
             CURRENT_COUNT: z.number().optional(),
@@ -22,4 +22,6 @@ export const AmenitiesSchema = z.object({
     }),
 })
 
-export type Amenities = z.infer<typeof AmenitiesSchema>;
+export type Attributes = z.infer<typeof AttributesSchema>;
+export const AttributeArraySchema = z.array(AttributeSchema);
+export type AttributeList = z.infer<typeof AttributeArraySchema>;

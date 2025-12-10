@@ -197,6 +197,71 @@
         }
       }
     },
+    "/api/v1/ridb/attributesByCampsiteId": {
+      "get": {
+        "tags": [
+          "Attributes"
+        ],
+        "summary": "Fetch and normalize RIDB campsite attributes data.",
+        "description": "Returns a normalized view of attributes from the Recreation Information Database (RIDB).\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB CampsiteID (numeric ID from the recreation.gov list of attributes), e.g. **4000** for site 46 at North Rim Campground at Grand Canyon.\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "description": "Query filter criteria. Searches on attribute name using RIDB's substring matcher (e.g. `query=Fire Pit` will match \"Fire Pit\"). If left blank, this parameter is ignored and all attribute are returned.\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Page size for a single request to RIDB. Must be an integer between 1 and 50 (RIDB maximum). Defaults to **50** when not provided.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "example": 50,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "description": "Start record of the overall result set, as defined by the RIDB API. Must be a non-negative integer. Defaults to **0** when not provided.\n",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized attributes"
+          },
+          "400": {
+            "description": "Invalid query parameters (e.g. limit or offset)"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
     "/api/v1/ridb/facility": {
       "get": {
         "tags": [
