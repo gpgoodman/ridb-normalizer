@@ -193,11 +193,8 @@ export async function GET(request: Request) {
 
                 offset += limit;
             }
-
-            return NextResponse.json(normalizeAttributes(all), { status: 200 });
+            return NextResponse.json({raw: all, normalized: normalizeAttributes(all)}, { status: 200 });
         }
-
-
 
         const rawLimit = searchParams.get('limit');
         let limit = RIDB_PAGE_LIMIT;
