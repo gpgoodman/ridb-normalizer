@@ -93,6 +93,17 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *           example: false
  *           default: false
  *
+ *       - in: query
+ *         name: includeRaw
+ *         required: false
+ *         description: >
+ *           When true, this endpoint will include the raw RIDB response, useful for
+ *           debugging.
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *           default: false
+ *
  *     responses:
  *       200:
  *         description: Normalized activities
@@ -124,6 +135,9 @@ export async function GET(request: Request) {
             accept: 'application/json',
             apikey: process.env.RIDB_API_KEY!,
         };
+
+        const rawIncludeRaw = searchParams.get('includeRaw');
+        const includeRaw = rawIncludeRaw === 'true';
 
         // --- getAll mode: page through RIDB and return everything (optionally filtered by query) ---
         if (getAll) {
@@ -168,8 +182,10 @@ export async function GET(request: Request) {
 
                 offset += limit;
             }
-
-            return NextResponse.json(normalizeActivities(all), { status: 200 });
+            if(includeRaw) {
+                return NextResponse.json({raw: all, normalized: normalizeActivities(all)}, { status: 200 });
+            }
+            return NextResponse.json({normalized: normalizeActivities(all)}, { status: 200 });
         }
 
         // --- Single-page mode: honor limit/offset and return one page ---
@@ -229,8 +245,10 @@ export async function GET(request: Request) {
 
         const parsed: Activities = ActivitiesSchema.parse(json);
         const items = parsed.RECDATA ?? [];
-
-        return NextResponse.json(normalizeActivities(items), { status: 200 });
+        if(includeRaw) {
+            return NextResponse.json({raw: items, normalized: normalizeActivities(items)}, { status: 200 });
+        }
+        return NextResponse.json({normalized: normalizeActivities(items)}, { status: 200 });
     } catch (error: unknown) {
         console.error('RIDB activities fetch error:', error);
         return NextResponse.json(
