@@ -148,6 +148,17 @@
               "example": 0,
               "default": 0
             }
+          },
+          {
+            "in": "query",
+            "name": "includeRaw",
+            "required": false,
+            "description": "When true, this endpoint will include the raw RIDB response, useful for debugging.\n",
+            "schema": {
+              "type": "boolean",
+              "example": false,
+              "default": false
+            }
           }
         ],
         "responses": {

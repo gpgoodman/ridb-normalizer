@@ -96,6 +96,17 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *           example: 0
  *           default: 0
  *
+ *       - in: query
+ *         name: includeRaw
+ *         required: false
+ *         description: >
+ *           When true, this endpoint will include the raw RIDB response, useful for
+ *           debugging.
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *           default: false
+ *
  *     responses:
  *       200:
  *         description: Normalized activities by facility
@@ -122,6 +133,9 @@ export async function GET(request: Request) {
                 { status: 500 }
             );
         }
+
+        const rawIncludeRaw = searchParams.get('includeRaw');
+        const includeRaw = rawIncludeRaw === 'true';
 
         const rawLimit = searchParams.get('limit');
         const rawOffset = searchParams.get('offset');
@@ -238,8 +252,10 @@ export async function GET(request: Request) {
         if (take !== null) {
             normalized = normalized.slice(0, take);
         }
-
-        return NextResponse.json(normalized, { status: 200 });
+        if(includeRaw) {
+            return NextResponse.json({raw: all, normalized}, { status: 200 });
+        }
+        return NextResponse.json({normalized}, { status: 200 });
     } catch (error: unknown) {
         console.error('RIDB activitiesByFacilityId fetch error:', error);
         return NextResponse.json(
