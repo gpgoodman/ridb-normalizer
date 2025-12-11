@@ -234,8 +234,6 @@ export async function GET(request: Request) {
             `${RIDB_BASE_URL}/${encodeURIComponent(id)}/attributes?limit=${limit}&offset=${offset}` +
             (query ? `&query=${encodeURIComponent(query)}` : '');
 
-        console.log(url)
-
         const response = await fetchWithTimeout(url, headers);
 
         if (!response.ok) {
@@ -249,7 +247,7 @@ export async function GET(request: Request) {
         } catch {
             throw new Error('Invalid or incomplete JSON received from RIDB (campsite attributes)');
         }
-        console.log(json)
+
         const parsed: Attributes = AttributesSchema.parse(json);
         const items = parsed.RECDATA ?? [];
         if(includeRaw) {
