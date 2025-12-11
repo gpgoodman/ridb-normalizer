@@ -41,6 +41,18 @@ function hasFacilityID(x: unknown): x is { FacilityID: unknown } {
  *           type: string
  *           example: "232490"
  *           default: "232490"
+ *
+ *       - in: query
+ *         name: includeRaw
+ *         required: false
+ *         description: >
+ *           When true, this endpoint will include the raw RIDB response, useful for
+ *           debugging.
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *           default: false
+ *
  *     responses:
  *       200:
  *         description: Normalized facility
@@ -71,6 +83,9 @@ export async function GET(request: Request) {
                 { status: 500 }
             );
         }
+
+        const rawIncludeRaw = searchParams.get('includeRaw');
+        const includeRaw = rawIncludeRaw === 'true';
 
         const url = `${RIDB_BASE_URL}/${encodeURIComponent(id)}?full=true`;
 
@@ -111,7 +126,10 @@ export async function GET(request: Request) {
         // Normalize and return
         const parsed = FacilitySchema.parse(data);
         const normalized = normalizeFacility(parsed);
-        return NextResponse.json(normalized, { status: 200 });
+        if(includeRaw) {
+            return NextResponse.json({raw: parsed, normalized: normalized}, { status: 200 });
+        }
+        return NextResponse.json({normalized: normalized}, { status: 200 });
     } catch (error: unknown) {
         console.error('RIDB fetch error:', error);
         return NextResponse.json(
