@@ -203,7 +203,7 @@
           "Attributes"
         ],
         "summary": "Fetch and normalize RIDB campsite attributes data.",
-        "description": "Returns a normalized view of attributes from the Recreation Information Database (RIDB).\n",
+        "description": "Returns a normalized view of attributes from the Recreation Information Database (RIDB).\nBy default (when `getAll` is not provided or false), this endpoint returns a **single page** of activities, controlled by the `limit` and `offset` parameters.\nWhen `getAll` is true, the endpoint will page through the RIDB /activities API using a page size of 50 and return **all** activities in a single response. In this mode, any `limit` and `offset` query parameters are ignored, even if they appear in the URL (including Swagger UI defaults).\n",
         "parameters": [
           {
             "in": "query",
@@ -246,6 +246,17 @@
               "minimum": 0,
               "example": 0,
               "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "getAll",
+            "required": false,
+            "description": "When true, this endpoint will page through the RIDB /activities API and return **all** activities in a single response. In this mode, the `limit` and `offset` query parameters are ignored, even if provided (including when Swagger UI shows default values of 50 and 0).\n",
+            "schema": {
+              "type": "boolean",
+              "example": false,
+              "default": false
             }
           }
         ],

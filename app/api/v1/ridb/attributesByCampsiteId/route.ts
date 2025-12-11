@@ -9,7 +9,7 @@ const RIDB_BASE_URL = 'https://ridb.recreation.gov/api/v1/campsites/';
 
 const FETCH_TIMEOUT_MS = 12_000;
 const RIDB_PAGE_LIMIT = 50; // RIDB max page size
-const MAX_PAGES_DEFAULT = 10;
+const MAX_PAGES_DEFAULT = 100;
 
 function getErrorMessage(err: unknown): string {
     return err instanceof Error ? err.message : 'Unknown error';
@@ -36,6 +36,15 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *     description: >
  *       Returns a normalized view of attributes from the Recreation Information
  *       Database (RIDB).
+ *
+ *       By default (when `getAll` is not provided or false), this endpoint returns
+ *       a **single page** of activities, controlled by the `limit` and `offset`
+ *       parameters.
+ *
+ *       When `getAll` is true, the endpoint will page through the RIDB /activities
+ *       API using a page size of 50 and return **all** activities in a single
+ *       response. In this mode, any `limit` and `offset` query parameters are
+ *       ignored, even if they appear in the URL (including Swagger UI defaults).
  *     parameters:
  *       - in: query
  *         name: id
@@ -79,6 +88,18 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *           example: 0
  *           default: 0
  *
+ *       - in: query
+ *         name: getAll
+ *         required: false
+ *         description: >
+ *           When true, this endpoint will page through the RIDB /activities API and
+ *           return **all** activities in a single response. In this mode, the
+ *           `limit` and `offset` query parameters are ignored, even if provided
+ *           (including when Swagger UI shows default values of 50 and 0).
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *           default: false
  *     responses:
  *       200:
  *         description: Normalized attributes
@@ -98,6 +119,8 @@ export async function GET(request: Request) {
                 { status: 400 }
             );
         }
+        const rawGetAll = searchParams.get('getAll');
+        const getAll = rawGetAll === 'true';
         // Treat null or empty/whitespace as "no query filter"
         const rawQuery = searchParams.get('query');
         const query =
@@ -112,6 +135,56 @@ export async function GET(request: Request) {
             accept: 'application/json',
             apikey: process.env.RIDB_API_KEY!,
         };
+
+        // --- getAll mode: page through RIDB and return everything (optionally filtered by query) ---
+        if (getAll) {
+            const all: Attributes['RECDATA'] = [];
+            let offset = 0;
+            const limit = RIDB_PAGE_LIMIT;
+
+            const rawMaxPages = searchParams.get('maxPages');
+            const maxPages =
+                Math.max(Number(rawMaxPages ?? MAX_PAGES_DEFAULT) || MAX_PAGES_DEFAULT, 1);
+
+            for (let page = 0; page < maxPages; page++) {
+                const url =
+                    `${RIDB_BASE_URL}/${encodeURIComponent(id)}/attributes?limit=${limit}&offset=${offset}` +
+                    (query ? `&query=${encodeURIComponent(query)}` : '');
+
+                const response = await fetchWithTimeout(url, headers);
+                if (!response.ok) {
+                    throw new Error(`RIDB API responded with ${response.status} ${response.statusText}`);
+                }
+
+                let json: unknown;
+                try {
+                    json = await response.json();
+                } catch {
+                    throw new Error('Invalid or incomplete JSON received from RIDB (activities)');
+                }
+
+                const parsed: Attributes = AttributesSchema.parse(json);
+                const items = parsed.RECDATA ?? [];
+
+                if (!items.length) {
+                    break;
+                }
+
+                all.push(...items);
+
+                // If we got fewer than a full page, we've hit the end.
+                if (items.length < limit) {
+                    break;
+                }
+
+                offset += limit;
+            }
+
+            return NextResponse.json(normalizeAttributes(all), { status: 200 });
+        }
+
+
+
         const rawLimit = searchParams.get('limit');
         let limit = RIDB_PAGE_LIMIT;
         if (rawLimit !== null) {
