@@ -54,6 +54,16 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *           e.g. **4** for Auto Touring.
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: includeRaw
+ *         required: false
+ *         description: >
+ *           When true, this endpoint will include the raw RIDB response, useful for
+ *           debugging.
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *           default: false
  *
  *     responses:
  *       200:
@@ -88,7 +98,8 @@ export async function GET(request: Request) {
             accept: 'application/json',
             apikey: process.env.RIDB_API_KEY!,
         };
-
+        const rawIncludeRaw = searchParams.get('includeRaw');
+        const includeRaw = rawIncludeRaw === 'true';
         const url =
             `${RIDB_BASE_URL}/${encodeURIComponent(id)}`;
 
@@ -115,7 +126,11 @@ export async function GET(request: Request) {
             );
         }
 
-        return NextResponse.json(normalized, { status: 200 });
+        if(includeRaw) {
+            return NextResponse.json({raw:parsed, normalized}, { status: 200 });
+        }
+
+        return NextResponse.json({normalized}, { status: 200 });
     } catch (error: unknown) {
         console.error('RIDB activityById fetch error:', error);
         return NextResponse.json(
