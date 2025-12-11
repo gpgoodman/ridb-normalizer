@@ -1,6 +1,6 @@
 # 🏕️ RIDB Normalizer
 
-**RIDB Normalizer** is an open-source project that fetches, cleans, and normalizes campground and campsite data from the [Recreation Information Database (RIDB)](https://ridb.recreation.gov/).  
+**RIDB Normalizer** is a project that fetches, cleans, and normalizes campground and campsite data from the [Recreation Information Database (RIDB)](https://ridb.recreation.gov/).  
 The goal is to provide a consistent, developer-friendly data model that can power projects like [Campvue](https://campvue.com) or any other recreation-focused applications.
 
 ## 🔗 Project Links
