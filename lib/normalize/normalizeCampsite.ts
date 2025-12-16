@@ -5,6 +5,7 @@ import {normalizeEquipment} from "@/lib/normalize/normalizeEquipment";
 import {normalizeMedia} from "@/lib/normalize/normalizeMedia";
 import {normalizeSiteNumber} from "@/lib/helpers/site";
 import {toTitleCase} from "@/lib/helpers/case";
+import {normalizeCoordinate} from "@/lib/helpers/numbers";
 
 export const normalizeCampsite = (data: Campsite):NormalizedCampsite => {
     const campsite = data[0];
@@ -15,8 +16,8 @@ export const normalizeCampsite = (data: Campsite):NormalizedCampsite => {
         loop: toTitleCase(campsite.Loop),
         isAccessible: campsite.CampsiteAccessible,
         use: campsite.TypeOfUse,
-        latitude: campsite.CampsiteLatitude,
-        longitude: campsite.CampsiteLongitude,
+        latitude: normalizeCoordinate(campsite.CampsiteLatitude),
+        longitude: normalizeCoordinate(campsite.CampsiteLongitude),
         reservable: campsite.CampsiteReservable,
         type: toTitleCase(campsite.CampsiteType),
         created: campsite.CreatedDate,
