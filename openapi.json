@@ -317,6 +317,48 @@
         }
       }
     },
+    "/api/v1/ridb/campsiteById": {
+      "get": {
+        "tags": [
+          "Campsites"
+        ],
+        "summary": "Fetch and normalize RIDB campsite data.",
+        "description": "Returns a normalized view of a single campsite from the Recreation Information Database (RIDB).\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB CampsiteID (numeric ID from the recreation.gov list of attributes), e.g. **4000** for site 46 at North Rim Campground at Grand Canyon.\n",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includeRaw",
+            "required": false,
+            "description": "When true, this endpoint will include the raw RIDB response, useful for debugging.\n",
+            "schema": {
+              "type": "boolean",
+              "example": false,
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized campsite"
+          },
+          "400": {
+            "description": "Invalid query parameters (e.g. limit or offset)"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
     "/api/v1/ridb/facility": {
       "get": {
         "tags": [

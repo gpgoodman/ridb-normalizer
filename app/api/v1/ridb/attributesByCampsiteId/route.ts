@@ -1,9 +1,8 @@
-import {normalizeAttributes} from "@/lib/normalize/normalizeAttributes";
-
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import {Attributes, AttributesSchema} from "@/lib/schemas/attributes";
+import {normalizeAttributes} from "@/lib/normalize/normalizeAttributes";
 
 const RIDB_BASE_URL = 'https://ridb.recreation.gov/api/v1/campsites/';
 
