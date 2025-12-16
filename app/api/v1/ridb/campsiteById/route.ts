@@ -45,6 +45,17 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *         schema:
  *           type: string
  *
+ *       - in: query
+ *         name: includeRaw
+ *         required: false
+ *         description: >
+ *           When true, this endpoint will include the raw RIDB response, useful for
+ *           debugging.
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *           default: false
+ *
  *     responses:
  *       200:
  *         description: Normalized campsite
@@ -71,6 +82,10 @@ export async function GET(request: Request) {
                 {status: 500}
             );
         }
+
+        const rawIncludeRaw = searchParams.get('includeRaw');
+        const includeRaw = rawIncludeRaw === 'true';
+
         const headers = {
             accept: 'application/json',
             apikey: process.env.RIDB_API_KEY!,
@@ -93,7 +108,13 @@ export async function GET(request: Request) {
         }
 
         const parsed: Campsite = CampsiteSchema.parse(json);
-        return NextResponse.json({normalized: normalizeCampsite(parsed)}, { status: 200 });
+
+        const normalized = normalizeCampsite(parsed);
+
+        if(includeRaw) {
+            return NextResponse.json({raw: parsed, normalized: normalized}, { status: 200 });
+        }
+        return NextResponse.json({normalized: normalized}, { status: 200 });
 
     } catch (error: unknown) {
         console.error('RIDB campsite attributes fetch error:', error);
