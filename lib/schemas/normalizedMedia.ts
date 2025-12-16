@@ -8,7 +8,7 @@ export const NormalizedMediaSchema = z.object({
     isGallery: z.boolean(),
     isPreview: z.boolean(),
     isPrimary: z.boolean(),
-    type: z.string().nullable().optional(),
+    type: z.string(),
     subtitle: z.string().nullable().optional(),
     title: z.string().nullable().optional(),
     url: z.url()

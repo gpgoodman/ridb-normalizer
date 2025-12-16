@@ -1,5 +1,5 @@
 import {EntityMedia, EntityMediaList} from "@/lib/schemas/entityMedia";
-import {z} from "zod";
+import {normalizeToLowerCase} from "@/lib/helpers/case";
 
 export const normalizeMedia = (media: EntityMediaList) => {
     return media.map((m: EntityMedia) => {
@@ -11,7 +11,7 @@ export const normalizeMedia = (media: EntityMediaList) => {
             isGallery: m.IsGallery,
             isPreview: m.IsPreview,
             isPrimary: m.IsPrimary,
-            type: m.MediaType,
+            type: normalizeToLowerCase(m.MediaType),
             subtitle: m.Subtitle,
             title: m.Title,
             url: m.URL

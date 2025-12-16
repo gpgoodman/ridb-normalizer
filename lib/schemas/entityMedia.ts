@@ -13,7 +13,7 @@ export const EntityMediaSchema = z.object({
     IsGallery: z.boolean().default(false),
     IsPreview: z.boolean().default(false),
     IsPrimary: z.boolean().default(false),
-    MediaType: z.string().nullable().optional(),
+    MediaType: z.string(),
     Subtitle: z.string().nullable().optional(),
     Title: z.string().nullable().optional(),
     URL: z.url(),
