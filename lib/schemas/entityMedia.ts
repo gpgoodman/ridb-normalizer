@@ -9,6 +9,7 @@ export const EntityMediaSchema = z.object({
     Credits: z.string().nullable().optional(),
     Description: z.string().nullable().optional(),
     Height: numberish,
+    Width: numberish,
     IsGallery: z.boolean().default(false),
     IsPreview: z.boolean().default(false),
     IsPrimary: z.boolean().default(false),
@@ -16,7 +17,9 @@ export const EntityMediaSchema = z.object({
     Subtitle: z.string().nullable().optional(),
     Title: z.string().nullable().optional(),
     URL: z.url(),
-    Width: numberish
 })
 
 export type EntityMedia =  z.infer<typeof EntityMediaSchema>;
+
+export const EntityMediaArraySchema = z.array(EntityMediaSchema);
+export type EntityMediaList = z.infer<typeof EntityMediaArraySchema>;
