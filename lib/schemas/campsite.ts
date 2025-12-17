@@ -7,7 +7,9 @@ const idAsString = z.union([z.string(), z.number()])
     .transform(v => String(v).trim())
     .refine(v => v.length > 0, "ID must be non-empty");
 
-export const CampsiteSchema = z.array(z.object({
+
+
+export const CampsiteSchema = z.object({
     FacilityID:idAsString,
     CampsiteAccessible: z.boolean().default(false),
     CampsiteID: idAsString,
@@ -23,8 +25,11 @@ export const CampsiteSchema = z.array(z.object({
     ATTRIBUTES: z.array(AttributeSchema).default([]),
     PERMITTEDEQUIPMENT: z.array(PermittedEquipmentSchema).catch([]),
     ENTITYMEDIA: z.array(EntityMediaSchema).catch([]),
-    })
+    }
 
 )
 
 export type Campsite = z.infer<typeof CampsiteSchema>;
+
+export const CampsitesSchema = z.array(CampsiteSchema)
+export type Campsites = z.infer<typeof CampsitesSchema>;

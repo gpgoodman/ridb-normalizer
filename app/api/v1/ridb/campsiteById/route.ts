@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import {normalizeCampsite} from "@/lib/normalize/normalizeCampsite";
-import {Campsite, CampsiteSchema} from "@/lib/schemas/campsite";
+import {Campsite, CampsiteSchema, Campsites, CampsitesSchema} from "@/lib/schemas/campsite";
 
 
 export const dynamic = 'force-dynamic';
@@ -107,9 +107,11 @@ export async function GET(request: Request) {
             throw new Error('Invalid or incomplete JSON received from RIDB (campsite attributes)');
         }
 
-        const parsed: Campsite = CampsiteSchema.parse(json);
+        const parsed: Campsites = CampsitesSchema.parse(json);
 
-        const normalized = normalizeCampsite(parsed);
+        const campsite: Campsite = parsed[0];
+
+        const normalized = normalizeCampsite(campsite);
 
         if(includeRaw) {
             return NextResponse.json({raw: parsed, normalized: normalized}, { status: 200 });

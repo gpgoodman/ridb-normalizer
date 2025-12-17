@@ -22,3 +22,7 @@ export const NormalizedCampsiteSchema = z.object({
 })
 
 export type NormalizedCampsite = z.infer<typeof NormalizedCampsiteSchema>;
+
+export const NormalizedCampsitesSchema = z.array(NormalizedCampsiteSchema);
+
+export type NormalizedCampsitesList = z.infer<typeof NormalizedCampsitesSchema>;
