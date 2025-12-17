@@ -32,33 +32,32 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *       - Campsites
  *     summary: Fetch and normalize RIDB campsites by facility.
  *     description: >
- *       Returns a normalized view of campsites grouped by campground from the Recreation Information
+ *       Returns a normalized view of campsites per campground from the Recreation Information
  *       Database (RIDB).
  *
- *       By default (when `getAll` is not provided or false), this endpoint returns
- *       a **single page** of activities, controlled by the `limit` and `offset`
- *       parameters.
+ *       We supplement the data by parsing the intent, and categorize site features by scope,
+ *       (e.g. campsite level or campground level), and stuff like is the feature an amenity?
  *
- *       When `getAll` is true, the endpoint will page through the RIDB /activities
- *       API using a page size of 50 and return **all** activities in a single
- *       response. In this mode, any `limit` and `offset` query parameters are
- *       ignored, even if they appear in the URL (including Swagger UI defaults).
+ *       One use case is, you can now easily filter for campground scoped attributes or campsite level,
+ *       making the data much more versatile by keeping two concerns separate.
  *     parameters:
  *       - in: query
  *         name: id
  *         required: true
  *         description: >
  *           RIDB FacilityID (numeric ID from the recreation.gov campground URL),
- *           e.g. **232490** for Mather Campground at Grand Canyon.
+ *           e.g. **234672** for Upper Stony Creek in the Sequoia National Forest.
  *         schema:
  *           type: string
+ *           example: 234672
  *       - in: query
  *         name: query
  *         required: false
  *         description: >
  *           Query filter criteria. Searches on campsites using RIDB's substring
- *           matcher (e.g. `query=43` will match sites "43", "143", "243", etc). If left blank, this
- *           parameter is ignored and all activities are returned.
+ *           matcher (e.g. `query=3` will match sites "3", "13", etc). If left blank, this
+ *           parameter is ignored and all activities are returned. This is just a pass through behavior
+ *           from the raw api.
  *         schema:
  *           type: string
  *       - in: query
@@ -66,13 +65,14 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *         required: false
  *         description: >
  *           Page size for a single request to RIDB. Must be an integer between 1
- *           and 50 (RIDB maximum). Defaults to **50** when not provided.
- *           Ignored when `getAll=true`.
+ *           and 50 (RIDB maximum). Defaults to **5** when not provided.
+ *           Swagger's UI lags a lot on large responses, so recommend starting with limit of 5
+ *           if you just want to sample the data.
  *         schema:
  *           type: integer
  *           minimum: 1
  *           maximum: 50
- *           example: 50
+ *           example: 5
  *           default: 50
  *
  *       - in: query
@@ -87,19 +87,6 @@ async function fetchWithTimeout(url: string, headers: HeadersInit): Promise<Resp
  *           minimum: 0
  *           example: 0
  *           default: 0
- *
- *       - in: query
- *         name: getAll
- *         required: false
- *         description: >
- *           When true, this endpoint will page through the RIDB /activities API and
- *           return **all** activities in a single response. In this mode, the
- *           `limit` and `offset` query parameters are ignored, even if provided
- *           (including when Swagger UI shows default values of 50 and 0).
- *         schema:
- *           type: boolean
- *           example: false
- *           default: false
  *
  *       - in: query
  *         name: includeRaw
@@ -213,7 +200,7 @@ export async function GET(request: Request) {
 
         const items = parsed.RECDATA ?? [];
 
-        console.log(items.length);
+        // console.log(items.length);
 
         if(includeRaw) {
             return NextResponse.json({raw: items, normalized: normalizeCampsites(items)}, { status: 200 });
