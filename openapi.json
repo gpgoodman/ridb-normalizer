@@ -26,6 +26,48 @@
     }
   ],
   "paths": {
+    "/api/v1/campvue/vehicleLengths": {
+      "get": {
+        "tags": [
+          "Campvue"
+        ],
+        "summary": "Fetch max vehicle lengths for a campground and each campsite.",
+        "description": "Uses normalized campsite data by campground (dervied from RIDB) to reduce to a max vehicle length as well as exposes campsite lengths .\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "description": "RIDB FacilityID (numeric ID from the recreation.gov campground URL), e.g. **234672** for Upper Stony Creek in the Sequoia National Forest.\n",
+            "schema": {
+              "type": "string",
+              "example": 234672
+            }
+          },
+          {
+            "in": "query",
+            "name": "isReservable",
+            "required": false,
+            "description": "filters by either reservable or non-reservable campsites. Is optional, and if not defined, returns all results\n",
+            "schema": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Max vehicle lengths by campground and campsite"
+          },
+          "400": {
+            "description": "Invalid query parameters (e.g. id)"
+          },
+          "500": {
+            "description": "RIDB error or server error"
+          }
+        }
+      }
+    },
     "/api/v1/ridb/activities": {
       "get": {
         "tags": [

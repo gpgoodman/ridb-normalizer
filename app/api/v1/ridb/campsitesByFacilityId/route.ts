@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 import {normalizeCampsites} from "@/lib/normalize/normalizeCampsites";
-import {Campsites, CampsitesSchema} from "@/lib/schemas/campsite";
 import {NextResponse} from 'next/server';
 import {RIDBCampsitesResponseSchema, RIDBCampsitesResponse} from "@/lib/schemas/campsites"
 
@@ -171,7 +170,6 @@ export async function GET(request: Request) {
             }
             offset = parsedOffset;
         }
-
 
         const headers = {
             accept: 'application/json',
